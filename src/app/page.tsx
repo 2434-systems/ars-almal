@@ -83,7 +83,7 @@ export default function Home() {
     });
   }, []);
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-slate-100">
+    <main className="flex w-full h-screen flex-col items-center justify-center p-24 bg-slate-100 overflow-hidden">
       <div className="absolute top-3 right-24">
         <Dialog.Root>
           <Dialog.Trigger asChild>
@@ -206,7 +206,7 @@ export default function Home() {
         <Image
           className="relative rounded-full drop-shadow-2xl hover:scale-110 transition-transform duration-200 ease-in-out hover:cursor-pointer"
           src="/ars.png"
-          alt="Big Head"
+          alt="Big Face"
           width={counter / 1000 + 300}
           height={counter / 1000 + 300}
           priority
@@ -218,7 +218,7 @@ export default function Home() {
             <h2>
               頭の幅が
               <span className="text-blue-400 font-bold">
-                {(counter / 100000).toFixed(2)}km
+                {(counter / 100000).toFixed(3)}km
               </span>
               になった
             </h2>
@@ -226,7 +226,7 @@ export default function Home() {
             <h2>
               her head is now{" "}
               <span className="text-blue-400 font-bold">
-                {(counter / 100000).toFixed(2)}km
+                {(counter / 100000).toFixed(3)}km
               </span>{" "}
               wide
             </h2>

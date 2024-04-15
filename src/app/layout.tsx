@@ -7,7 +7,7 @@ import { Theme } from "@radix-ui/themes";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ars Almal's Big Head",
+  title: "Ars Almal's Big Face",
   description: "How big can she go?",
 };
 
