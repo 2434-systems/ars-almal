@@ -36,11 +36,17 @@ const config: Config = {
           },
           to: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
         },
+        fallAndFade: {
+          "0%": { transform: "translateY(-100px)", opacity: "1" },
+          "90%": { opacity: "1" },
+          "100%": { transform: "translateY(100vh)", opacity: "0" },
+        },
       },
       animation: {
         clicky: "clicky 0.2s ease-in-out",
         overlayShow: "overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
         contentShow: "contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+        animateFall: "fall-and-fade 4s linear forwards",
       },
     },
   },

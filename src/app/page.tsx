@@ -143,13 +143,15 @@ export default function Home() {
                       <Table.RowHeaderCell>
                         {isJP ? "あなたのクリック数" : "Your clicks"}
                       </Table.RowHeaderCell>
-                      <Table.Cell>{userData.counter || 0}</Table.Cell>
+                      <Table.Cell>{userData ? userData.counter : 0}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
                       <Table.RowHeaderCell>
                         {isJP ? "あなたのクリック数" : "Your progress"}
                       </Table.RowHeaderCell>
-                      <Table.Cell>{(userData.progress || 0) / 100}m</Table.Cell>
+                      <Table.Cell>
+                        {(userData ? userData.progress : 0) / 100}m
+                      </Table.Cell>
                     </Table.Row>
                   </Table.Body>
                 </Table.Root>
