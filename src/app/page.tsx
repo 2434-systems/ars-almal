@@ -3,6 +3,7 @@ import Image from "next/image";
 import { initializeApp } from "firebase/app";
 import { getDatabase, set, ref, increment, onValue } from "firebase/database";
 import { useEffect, useState } from "react";
+import { Switch } from "@radix-ui/themes";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -38,9 +39,14 @@ export default function Home() {
     });
   });
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-white">
-      <div>
-        <h1 className="text-black pb-8 text-3xl">ars almal</h1>
+    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-slate-100">
+      <div className="absolute t-0 r-0">
+        <Switch />
+      </div>
+      <div className="w-full">
+        <h1 className="text-black pb-8 text-center text-[5vw] sm:text-3xl font-bold">
+          ars almal
+        </h1>
       </div>
       <div
         className={`relative flex place-items-center ${
@@ -58,8 +64,11 @@ export default function Home() {
           priority
         />
       </div>
-      <div>
-        <h2 className="text-black pt-8">her head is now {counter}cm wide</h2>
+      <div className="flex w-full flex-row justify-center">
+        <h2 className="w-full text-black pt-8 text-center text-[3.5vw] sm:text-xl">
+          her head is now{" "}
+          <span className="text-blue-400 font-bold">{counter / 100}m</span> wide
+        </h2>
       </div>
     </main>
   );
