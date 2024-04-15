@@ -5,6 +5,7 @@ import { getDatabase, set, ref, increment, onValue } from "firebase/database";
 import { useEffect, useState } from "react";
 import { Switch } from "@radix-ui/themes";
 import { v4 as uuid } from "uuid";
+import useSound from "use-sound";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,6 +18,8 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+const files = ["gushi", "ausaumau1", "ausaumau2", "laugh1", "tasukete"];
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -27,8 +30,14 @@ export default function Home() {
   const handleAnimationEnd = () => setPulse(false);
   const triggerPulse = () => setPulse(true);
 
+  const [play] = useSound(
+    `/audio/${files[Math.floor(Math.random() * 5)]}.mp3`,
+    { volume: 0.25 }
+  );
+
   const onClick = async () => {
     triggerPulse();
+    play();
     await set(ref(db, "global"), {
       counter: increment(1),
     });
