@@ -22,6 +22,7 @@ const db = getDatabase(app);
 export default function Home() {
   const [counter, setCounter] = useState(0);
   const [pulse, setPulse] = useState(false);
+  const [isJP, setIsJP] = useState(false);
   const handleAnimationEnd = () => setPulse(false);
   const triggerPulse = () => setPulse(true);
 
@@ -31,6 +32,7 @@ export default function Home() {
       counter: increment(1),
     });
   };
+  const onCheckedChange = (checked: boolean) => setIsJP(checked);
   const globalData = ref(db, "global");
   useEffect(() => {
     onValue(globalData, (snapshot) => {
@@ -40,12 +42,21 @@ export default function Home() {
   });
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-slate-100">
-      <div className="absolute t-0 r-0">
-        <Switch />
+      <div className="absolute top-4 right-4">
+        <Switch
+          size="3"
+          className="hover:cursor-pointer"
+          onCheckedChange={onCheckedChange}
+        />
+        {isJP ? " JP" : " EN"}
       </div>
       <div className="w-full">
-        <h1 className="text-black pb-8 text-center text-[5vw] sm:text-3xl font-bold">
-          ars almal
+        <h1
+          className={`text-black pb-8 text-center ${
+            isJP ? "text-[3.3vw]" : "text-[5vw]"
+          } sm:text-3xl font-bold`}
+        >
+          {isJP ? "アルス・アルマル" : "ars almal"}
         </h1>
       </div>
       <div
@@ -59,16 +70,27 @@ export default function Home() {
           className="relative rounded-full drop-shadow-2xl hover:scale-110 transition-transform duration-200 ease-in-out hover:cursor-pointer"
           src="/ars.png"
           alt="Big Head"
-          width={300}
-          height={300}
+          width={counter / 1000 + 300}
+          height={counter / 1000 + 300}
           priority
         />
       </div>
       <div className="flex w-full flex-row justify-center">
-        <h2 className="w-full text-black pt-8 text-center text-[3.5vw] sm:text-xl">
-          her head is now{" "}
-          <span className="text-blue-400 font-bold">{counter / 100}m</span> wide
-        </h2>
+        <div className="w-full text-black pt-8 text-center text-[3.5vw] sm:text-xl">
+          {isJP ? (
+            <h2>
+              頭の幅が
+              <span className="text-blue-400 font-bold">{counter / 100}m</span>
+              になった
+            </h2>
+          ) : (
+            <h2>
+              her head is now{" "}
+              <span className="text-blue-400 font-bold">{counter / 100}m</span>{" "}
+              wide
+            </h2>
+          )}
+        </div>
       </div>
     </main>
   );
