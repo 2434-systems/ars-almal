@@ -1,9 +1,21 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { initializeApp } from "firebase/app";
 import { getDatabase, set, ref, increment, onValue } from "firebase/database";
-import { useEffect, useState } from "react";
-import { Switch } from "@radix-ui/themes";
+
+import {
+  Button,
+  Flex,
+  IconButton,
+  Switch,
+  Table,
+  Text,
+  TextField,
+} from "@radix-ui/themes";
+import * as Dialog from "@radix-ui/react-dialog";
+import { QuestionMarkIcon, Cross2Icon } from "@radix-ui/react-icons";
+
 import { v4 as uuid } from "uuid";
 import useSound from "use-sound";
 
@@ -18,21 +30,30 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const files = ["gushi", "ausaumau1", "ausaumau2", "laugh1", "tasukete"];
+const files = [
+  "gushi",
+  "ausaumau1",
+  "ausaumau2",
+  "laugh1",
+  "tasukete",
+  "hentai",
+  "mad",
+];
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 export default function Home() {
   const [counter, setCounter] = useState(0);
+  const [personalCount, setPersonalCount] = useState(0);
   const [pulse, setPulse] = useState(false);
   const [isJP, setIsJP] = useState(false);
   const handleAnimationEnd = () => setPulse(false);
   const triggerPulse = () => setPulse(true);
 
   const [play] = useSound(
-    `/audio/${files[Math.floor(Math.random() * 5)]}.mp3`,
-    { volume: 0.25 }
+    `/audio/${files[Math.floor(Math.random() * files.length)]}.mp3`,
+    { volume: 0.5 }
   );
 
   const onClick = async () => {
@@ -52,13 +73,80 @@ export default function Home() {
     if (!userId) {
       localStorage.setItem("userId", uuid());
     }
+    const userData = ref(db, "users/" + localStorage.getItem("userId"));
     onValue(globalData, (snapshot) => {
       const count = snapshot.val().counter;
       setCounter(count);
     });
+    onValue(userData, (snapshot) => {
+      const userCount = snapshot.val().counter;
+      setPersonalCount(userCount);
+    });
   });
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-slate-100">
+      <div className="absolute top-3 right-24">
+        <Dialog.Root>
+          <Dialog.Trigger asChild>
+            <IconButton
+              className="hover:cursor-pointer items-center justify-center"
+              variant="outline"
+            >
+              <QuestionMarkIcon />
+            </IconButton>
+          </Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Overlay className="bg-black-800 data-[state=open]:animate-overlayShow fixed inset-0" />
+
+            <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
+              <Dialog.Title className="text-mauve12 m-0 text-[17px] font-medium">
+                {isJP ? "情報" : "Information"}
+              </Dialog.Title>
+              <Dialog.Description className="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
+                {isJP
+                  ? "アルスの頭はどこまで大きくなるのか？"
+                  : "How big can her head go?"}
+              </Dialog.Description>
+              <Table.Root>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.ColumnHeaderCell>
+                      {isJP ? "統計情報" : "Statistics"}
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                      {isJP ? "値" : "Value"}
+                    </Table.ColumnHeaderCell>
+                  </Table.Row>
+                </Table.Header>
+
+                <Table.Body>
+                  <Table.Row>
+                    <Table.RowHeaderCell>
+                      {isJP ? "あなたのクリック数" : "Your clicks"}
+                    </Table.RowHeaderCell>
+                    <Table.Cell>{personalCount}</Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table.Root>
+              {/* <div className="mt-[25px] flex justify-end">
+                <Dialog.Close asChild>
+                  <button className="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
+                    Save changes
+                  </button>
+                </Dialog.Close>
+              </div> */}
+              <Dialog.Close asChild>
+                <button
+                  className="text-violet11 hover:bg-violet4 focus:shadow-violet7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
+                  aria-label="Close"
+                >
+                  <Cross2Icon />
+                </button>
+              </Dialog.Close>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </div>
       <div className="absolute top-4 right-4">
         <Switch
           size="3"
