@@ -67,12 +67,13 @@ export default function Home() {
     });
   };
   const onCheckedChange = (checked: boolean) => setIsJP(checked);
-  const globalData = ref(db, "global");
+
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
       localStorage.setItem("userId", uuid());
     }
+    const globalData = ref(db, "global");
     const userData = ref(db, "users/" + localStorage.getItem("userId"));
     onValue(globalData, (snapshot) => {
       const count = snapshot.val().counter;
@@ -82,7 +83,7 @@ export default function Home() {
       const userCount = snapshot.val().counter;
       setPersonalCount(userCount);
     });
-  });
+  }, []);
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-slate-100">
       <div className="absolute top-3 right-24">
@@ -96,7 +97,7 @@ export default function Home() {
             </IconButton>
           </Dialog.Trigger>
           <Dialog.Portal>
-            <Dialog.Overlay className="bg-black-800 data-[state=open]:animate-overlayShow fixed inset-0" />
+            <Dialog.Overlay className="bg-blackA data-[state=open]:animate-overlayShow fixed inset-0" />
 
             <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
               <Dialog.Title className="text-mauve12 m-0 text-[17px] font-medium">
@@ -107,27 +108,30 @@ export default function Home() {
                   ? "アルスの頭はどこまで大きくなるのか？"
                   : "How big can her head go?"}
               </Dialog.Description>
-              <Table.Root>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.ColumnHeaderCell>
-                      {isJP ? "統計情報" : "Statistics"}
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>
-                      {isJP ? "値" : "Value"}
-                    </Table.ColumnHeaderCell>
-                  </Table.Row>
-                </Table.Header>
+              <div className="pb-4">
+                <Table.Root size="2">
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.ColumnHeaderCell>
+                        {isJP ? "統計情報" : "Statistics"}
+                      </Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell>
+                        {isJP ? "値" : "Value"}
+                      </Table.ColumnHeaderCell>
+                    </Table.Row>
+                  </Table.Header>
 
-                <Table.Body>
-                  <Table.Row>
-                    <Table.RowHeaderCell>
-                      {isJP ? "あなたのクリック数" : "Your clicks"}
-                    </Table.RowHeaderCell>
-                    <Table.Cell>{personalCount}</Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table.Root>
+                  <Table.Body>
+                    <Table.Row>
+                      <Table.RowHeaderCell>
+                        {isJP ? "あなたのクリック数" : "Your clicks"}
+                      </Table.RowHeaderCell>
+                      <Table.Cell>{personalCount}</Table.Cell>
+                    </Table.Row>
+                  </Table.Body>
+                </Table.Root>
+              </div>
+
               {/* <div className="mt-[25px] flex justify-end">
                 <Dialog.Close asChild>
                   <button className="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
@@ -135,6 +139,11 @@ export default function Home() {
                   </button>
                 </Dialog.Close>
               </div> */}
+              <Flex direction="column" gap="3">
+                <Text as="div" size="1" mb="1" weight="bold" color="gray">
+                  Made with ❤️ by <a href="https://x.com/eightyzy">80</a>
+                </Text>
+              </Flex>
               <Dialog.Close asChild>
                 <button
                   className="text-violet11 hover:bg-violet4 focus:shadow-violet7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
