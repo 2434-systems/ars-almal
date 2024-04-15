@@ -104,9 +104,28 @@ export default function Home() {
                 {isJP ? "情報" : "Information"}
               </Dialog.Title>
               <Dialog.Description className="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
-                {isJP
-                  ? "アルスの頭はどこまで大きくなるのか？"
-                  : "How big can her head go?"}
+                {isJP ? (
+                  <span>
+                    <a
+                      href="https://www.youtube.com/@ArsAlmal"
+                      className="text-blue-400"
+                    >
+                      アルス・アルマル
+                    </a>{" "}
+                    はにじさんじ所属のバーチャルYouTuberです。とてもかわいい小さな頭を持っていますが、どれくらい大きくなるのでしょうか?
+                  </span>
+                ) : (
+                  <span>
+                    <a
+                      href="https://www.youtube.com/@ArsAlmal"
+                      className="text-blue-400"
+                    >
+                      Ars Almal
+                    </a>{" "}
+                    is a Virtual Youtuber affiliated with Nijisanji. She has a
+                    very cute and tiny head. But how big can she go?
+                  </span>
+                )}
               </Dialog.Description>
               <div className="pb-4">
                 <Table.Root size="2">
