@@ -4,20 +4,17 @@ import Image from "next/image";
 import { initializeApp } from "firebase/app";
 import { getDatabase, set, ref, increment, onValue } from "firebase/database";
 
-import {
-  Button,
-  Flex,
-  IconButton,
-  Switch,
-  Table,
-  Text,
-  TextField,
-} from "@radix-ui/themes";
+import { Flex, IconButton, Switch, Table, Text } from "@radix-ui/themes";
 import * as Dialog from "@radix-ui/react-dialog";
 import { QuestionMarkIcon, Cross2Icon } from "@radix-ui/react-icons";
 
 import { v4 as uuid } from "uuid";
 import useSound from "use-sound";
+
+type UserData = {
+  counter: number;
+  progress: number;
+};
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -45,7 +42,7 @@ const db = getDatabase(app);
 
 export default function Home() {
   const [counter, setCounter] = useState(0);
-  const [personalCount, setPersonalCount] = useState(0);
+  const [userData, setUserData] = useState({} as UserData);
   const [pulse, setPulse] = useState(false);
   const [isJP, setIsJP] = useState(false);
   const handleAnimationEnd = () => setPulse(false);
@@ -60,10 +57,11 @@ export default function Home() {
     triggerPulse();
     play();
     await set(ref(db, "global"), {
-      counter: increment(1),
+      counter: increment(100),
     });
     await set(ref(db, "users/" + localStorage.getItem("userId")), {
       counter: increment(1),
+      progress: increment(100),
     });
   };
   const onCheckedChange = (checked: boolean) => setIsJP(checked);
@@ -80,8 +78,8 @@ export default function Home() {
       setCounter(count);
     });
     onValue(userData, (snapshot) => {
-      const userCount = snapshot.val().counter;
-      setPersonalCount(userCount);
+      const data = snapshot.val() as UserData;
+      setUserData(data);
     });
   }, []);
   return (
@@ -123,7 +121,7 @@ export default function Home() {
                       Ars Almal
                     </a>{" "}
                     is a Virtual Youtuber affiliated with Nijisanji. She has a
-                    very cute and tiny head. But how big can she go?
+                    very cute and tiny face. But how big can she go?
                   </span>
                 )}
               </Dialog.Description>
@@ -145,7 +143,13 @@ export default function Home() {
                       <Table.RowHeaderCell>
                         {isJP ? "あなたのクリック数" : "Your clicks"}
                       </Table.RowHeaderCell>
-                      <Table.Cell>{personalCount}</Table.Cell>
+                      <Table.Cell>{userData.counter || 0}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.RowHeaderCell>
+                        {isJP ? "あなたのクリック数" : "Your progress"}
+                      </Table.RowHeaderCell>
+                      <Table.Cell>{(userData.progress || 0) / 100}m</Table.Cell>
                     </Table.Row>
                   </Table.Body>
                 </Table.Root>
@@ -213,13 +217,17 @@ export default function Home() {
           {isJP ? (
             <h2>
               頭の幅が
-              <span className="text-blue-400 font-bold">{counter / 100}m</span>
+              <span className="text-blue-400 font-bold">
+                {(counter / 100000).toFixed(2)}km
+              </span>
               になった
             </h2>
           ) : (
             <h2>
               her head is now{" "}
-              <span className="text-blue-400 font-bold">{counter / 100}m</span>{" "}
+              <span className="text-blue-400 font-bold">
+                {(counter / 100000).toFixed(2)}km
+              </span>{" "}
               wide
             </h2>
           )}
