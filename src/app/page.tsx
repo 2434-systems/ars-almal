@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, set, ref, increment, onValue } from "firebase/database";
 import { useEffect, useState } from "react";
 import { Switch } from "@radix-ui/themes";
+import { v4 as uuid } from "uuid";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -31,10 +32,17 @@ export default function Home() {
     await set(ref(db, "global"), {
       counter: increment(1),
     });
+    await set(ref(db, "users/" + localStorage.getItem("userId")), {
+      counter: increment(1),
+    });
   };
   const onCheckedChange = (checked: boolean) => setIsJP(checked);
   const globalData = ref(db, "global");
   useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      localStorage.setItem("userId", uuid());
+    }
     onValue(globalData, (snapshot) => {
       const count = snapshot.val().counter;
       setCounter(count);
