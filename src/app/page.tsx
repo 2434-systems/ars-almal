@@ -88,7 +88,6 @@ export default function Home() {
       counter: incr,
       progress: incr,
     });
-    spawnFalling();
   };
   const onCheckedChange = (checked: boolean) => setIsJP(checked);
 
