@@ -16,6 +16,13 @@ type UserData = {
   progress: number;
 };
 
+type FallingImage = {
+  id: number;
+  randomX: number;
+  randomSway: string;
+  randomSize: number;
+};
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -40,6 +47,8 @@ const files = [
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+const incr = increment(process.env.NODE_ENV === "development" ? 0 : 100);
+
 export default function Home() {
   const [counter, setCounter] = useState(0);
   const [userData, setUserData] = useState({} as UserData);
@@ -47,22 +56,39 @@ export default function Home() {
   const [isJP, setIsJP] = useState(false);
   const handleAnimationEnd = () => setPulse(false);
   const triggerPulse = () => setPulse(true);
+  const [fallingImgs, setFallingImgs] = useState([] as FallingImage[]);
 
   const [play] = useSound(
     `/audio/${files[Math.floor(Math.random() * files.length)]}.mp3`,
     { volume: 0.5 }
   );
 
+  const spawnFalling = () => {
+    const id = new Date().getTime();
+    const randomX = Math.random() * 100; // Random horizontal start percentage
+    const randomSway = Math.random() > 0.5 ? "right" : "left"; // Randomly choose sway direction
+    const randomSize = Math.random() * 10 + 5; // Random size (10vw to 30vw)
+    const newImage = { id, randomX, randomSway, randomSize };
+    setFallingImgs((prevImages: FallingImage[]) => [...prevImages, newImage]);
+    setTimeout(() => {
+      setFallingImgs((prevImages: FallingImage[]) =>
+        prevImages.filter((img) => img.id !== id)
+      );
+    }, 4000);
+  };
+
   const onClick = async () => {
+    if (pulse) return;
     triggerPulse();
     play();
     await set(ref(db, "global"), {
-      counter: increment(100),
+      counter: incr,
     });
     await set(ref(db, "users/" + localStorage.getItem("userId")), {
-      counter: increment(1),
-      progress: increment(100),
+      counter: incr,
+      progress: incr,
     });
+    spawnFalling();
   };
   const onCheckedChange = (checked: boolean) => setIsJP(checked);
 
@@ -76,6 +102,7 @@ export default function Home() {
     onValue(globalData, (snapshot) => {
       const count = snapshot.val().counter;
       setCounter(count);
+      spawnFalling();
     });
     onValue(userData, (snapshot) => {
       const data = snapshot.val() as UserData;
@@ -84,7 +111,7 @@ export default function Home() {
   }, []);
   return (
     <main className="flex w-full h-screen flex-col items-center justify-center p-24 bg-slate-100 overflow-hidden">
-      <div className="absolute top-3 right-24">
+      <div className="absolute top-3 right-24 z-100">
         <Dialog.Root>
           <Dialog.Trigger asChild>
             <IconButton
@@ -171,7 +198,7 @@ export default function Home() {
               </Flex>
               <Dialog.Close asChild>
                 <button
-                  className="text-violet11 hover:bg-violet4 focus:shadow-violet7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
+                  className="text-violet11 hover:bg-violet4 focus:shadow-violet7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none z-20"
                   aria-label="Close"
                 >
                   <Cross2Icon />
@@ -184,7 +211,7 @@ export default function Home() {
       <div className="absolute top-4 right-4">
         <Switch
           size="3"
-          className="hover:cursor-pointer"
+          className="hover:cursor-pointer z-20"
           onCheckedChange={onCheckedChange}
         />
         {isJP ? " JP" : " EN"}
@@ -206,14 +233,34 @@ export default function Home() {
         onAnimationEnd={handleAnimationEnd}
       >
         <Image
-          className="relative rounded-full drop-shadow-2xl hover:scale-110 transition-transform duration-200 ease-in-out hover:cursor-pointer"
+          className="relative rounded-full drop-shadow-2xl hover:scale-110 active:scale-100 transition-transform duration-200 ease-in-out hover:cursor-pointer z-20"
           src="/ars.png"
           alt="Big Face"
-          width={counter / 1000 + 300}
-          height={counter / 1000 + 300}
+          width={counter / 2000 + 300}
+          height={counter / 2000 + 300}
           priority
         />
       </div>
+      {fallingImgs.map((img: FallingImage) => (
+        <Image
+          key={img.id}
+          src="/ars.png"
+          width={50}
+          height={50}
+          className={`absolute ${
+            img.randomSway === "right"
+              ? "animate-fall-right"
+              : "animate-fall-left"
+          } z-10`}
+          style={{
+            top: "-100px",
+            left: `${img.randomX}%`,
+            transform: "translateX(-50%)",
+            width: `${img.randomSize}vw`,
+          }}
+          alt="Falling Ars"
+        />
+      ))}
       <div className="flex w-full flex-row justify-center">
         <div className="w-full text-black pt-8 text-center text-[3.5vw] sm:text-xl">
           {isJP ? (
