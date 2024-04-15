@@ -4,7 +4,7 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, set, ref, increment, onValue } from "firebase/database";
 import { useEffect, useState } from "react";
 import { Switch } from "@radix-ui/themes";
-import crypto from "crypto";
+import { v4 as uuid } from "uuid";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -41,7 +41,7 @@ export default function Home() {
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      localStorage.setItem("userId", crypto.randomUUID());
+      localStorage.setItem("userId", uuid());
     }
     onValue(globalData, (snapshot) => {
       const count = snapshot.val().counter;
