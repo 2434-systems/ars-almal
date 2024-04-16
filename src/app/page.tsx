@@ -146,7 +146,7 @@ export default function Home() {
       <div className="absolute top-4 left-4 z-100 flex flex-row w-1/4 justify-left gap-4 items-center">
         <Dialog.Root>
           <Tooltip content={isJP ? "入店" : "Enter the store"} side="bottom">
-            <Box maxWidth="6rem" minWidth="6rem">
+            <Box maxWidth="8rem" minWidth="6.5rem">
               <Dialog.Trigger asChild>
                 <Card asChild className="hover:bg-gray-300 active:bg-gray-600">
                   <a className="hover:cursor-pointer">
@@ -200,28 +200,17 @@ export default function Home() {
                 {isJP ? "情報" : "Information"}
               </Dialog.Title>
               <Dialog.Description className="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
-                {isJP ? (
-                  <span>
-                    <a
-                      href="https://www.youtube.com/@ArsAlmal"
-                      className="text-blue-400"
-                    >
-                      アルス・アルマル
-                    </a>{" "}
-                    はにじさんじ所属のバーチャルYouTuberです。とてもかわいい小さな頭を持っていますが、どれくらい大きくなるのでしょうか?
-                  </span>
-                ) : (
-                  <span>
-                    <a
-                      href="https://www.youtube.com/@ArsAlmal"
-                      className="text-blue-400"
-                    >
-                      Ars Almal
-                    </a>{" "}
-                    is a Virtual Youtuber affiliated with Nijisanji. She has a
-                    very cute and tiny face. But how big can she go?
-                  </span>
-                )}
+                <span>
+                  <a
+                    href="https://www.youtube.com/@ArsAlmal"
+                    className="text-blue-400"
+                  >
+                    {isJP ? "アルス・アルマル" : "Ars Almal"}
+                  </a>
+                  {isJP
+                    ? "はにじさんじ所属のバーチャルYouTuberです。とてもかわいい小さな頭を持っていますが、どれくらい大きくなるのでしょうか?"
+                    : "is a Virtual Youtuber affiliated with Nijisanji. She has a very cute and tiny face. But how big can she go?"}
+                </span>
               </Dialog.Description>
               <div className="pb-4">
                 <Table.Root size="2">
