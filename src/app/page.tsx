@@ -146,13 +146,13 @@ export default function Home() {
       <div className="absolute top-4 left-4 z-100 flex flex-row w-1/4 justify-left gap-4 items-center">
         <Dialog.Root>
           <Tooltip content={isJP ? "入店" : "Enter the store"} side="bottom">
-            <Box maxWidth="8rem" minWidth="6.5rem">
+            <Box>
               <Dialog.Trigger asChild>
                 <Card asChild className="hover:bg-gray-300 active:bg-gray-600">
                   <a className="hover:cursor-pointer">
                     <Flex gap="3" align="center">
                       <RocketIcon />
-                      <Box>
+                      <Box className="text-nowrap">
                         <Text as="div" size="2" color="gray">
                           {(userData ? userData.currency : 0) || 0} ARS
                         </Text>
