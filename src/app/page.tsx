@@ -2,11 +2,32 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { initializeApp } from "firebase/app";
-import { getDatabase, set, ref, increment, onValue } from "firebase/database";
+import {
+  getDatabase,
+  set,
+  ref,
+  increment,
+  onValue,
+  get,
+} from "firebase/database";
 
-import { Flex, IconButton, Switch, Table, Text } from "@radix-ui/themes";
+import {
+  Box,
+  Card,
+  Flex,
+  IconButton,
+  Skeleton,
+  Switch,
+  Table,
+  Text,
+  Tooltip,
+} from "@radix-ui/themes";
 import * as Dialog from "@radix-ui/react-dialog";
-import { QuestionMarkIcon, Cross2Icon } from "@radix-ui/react-icons";
+import {
+  QuestionMarkIcon,
+  Cross2Icon,
+  RocketIcon,
+} from "@radix-ui/react-icons";
 
 import { v4 as uuid } from "uuid";
 import useSound from "use-sound";
@@ -14,6 +35,7 @@ import useSound from "use-sound";
 type UserData = {
   counter: number;
   progress: number;
+  currency: number;
 };
 
 type FallingImage = {
@@ -47,7 +69,8 @@ const files = [
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const incr = increment(process.env.NODE_ENV === "development" ? 0 : 100);
+const incr = (val: number) =>
+  increment(process.env.NODE_ENV === "development" ? 0 : val);
 
 export default function Home() {
   const [counter, setCounter] = useState(0);
@@ -82,11 +105,12 @@ export default function Home() {
     triggerPulse();
     play();
     await set(ref(db, "global"), {
-      counter: incr,
+      counter: incr(100),
     });
     await set(ref(db, "users/" + localStorage.getItem("userId")), {
-      counter: incr,
-      progress: incr,
+      counter: incr(1),
+      progress: incr(100),
+      currency: incr(1),
     });
   };
   const onCheckedChange = (checked: boolean) => setIsJP(checked);
@@ -97,17 +121,21 @@ export default function Home() {
       localStorage.setItem("userId", uuid());
     }
     const globalData = ref(db, "global");
-    const userData = ref(db, "users/" + localStorage.getItem("userId"));
-    onValue(globalData, (snapshot) => {
+    const userUnsub = onValue(ref(db, "users/" + userId), (snapshot) => {
+      const data = snapshot.val();
+      setUserData(data);
+    });
+    const globalUnsub = onValue(globalData, (snapshot) => {
       const count = snapshot.val().counter;
       setCounter(count);
       spawnFalling();
     });
-    onValue(userData, (snapshot) => {
-      const data = snapshot.val() as UserData;
-      setUserData(data);
-    });
+    return () => {
+      userUnsub();
+      globalUnsub();
+    };
   }, []);
+
   return (
     <main className="flex w-full h-screen flex-col items-center justify-center p-24 bg-slate-100 overflow-hidden">
       <div className="absolute top-3 right-24 z-100">
@@ -167,13 +195,13 @@ export default function Home() {
                   <Table.Body>
                     <Table.Row>
                       <Table.RowHeaderCell>
-                        {isJP ? "あなたのクリック数" : "Your clicks"}
+                        {isJP ? "クリック数" : "Your clicks"}
                       </Table.RowHeaderCell>
                       <Table.Cell>{userData ? userData.counter : 0}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
                       <Table.RowHeaderCell>
-                        {isJP ? "あなたのクリック数" : "Your progress"}
+                        {isJP ? "進歩" : "Your progress"}
                       </Table.RowHeaderCell>
                       <Table.Cell>
                         {(userData ? userData.progress : 0) / 100}m
@@ -207,12 +235,31 @@ export default function Home() {
           </Dialog.Portal>
         </Dialog.Root>
       </div>
+
+      <Box maxWidth="350px" className="absolute top-4 left-4">
+        <Card>
+          <Flex gap="3" align="center">
+            <RocketIcon />
+            <Box>
+              <Text as="div" size="2" color="gray">
+                {(userData ? userData.currency : 0) || 0} ARS
+              </Text>
+            </Box>
+          </Flex>
+        </Card>
+      </Box>
       <div className="absolute top-4 right-4">
-        <Switch
-          size="3"
-          className="hover:cursor-pointer z-20"
-          onCheckedChange={onCheckedChange}
-        />
+        <Tooltip
+          content={isJP ? "言語を切り替える" : "Switch language"}
+          side="bottom"
+        >
+          <Switch
+            size="3"
+            className="hover:cursor-pointer z-20"
+            onCheckedChange={onCheckedChange}
+            variant="soft"
+          />
+        </Tooltip>
         {isJP ? " JP" : " EN"}
       </div>
       <div className="w-full">
