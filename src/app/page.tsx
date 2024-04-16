@@ -13,10 +13,16 @@ import {
 
 import {
   Box,
+  Button,
   Card,
+  Container,
   Flex,
+  Grid,
   IconButton,
+  Inset,
+  ScrollArea,
   Skeleton,
+  Strong,
   Switch,
   Table,
   Text,
@@ -69,6 +75,8 @@ const files = [
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+const globalRef = ref(db, "global");
+
 const incr = (val: number) =>
   increment(process.env.NODE_ENV === "development" ? 0 : val);
 
@@ -85,6 +93,8 @@ export default function Home() {
     `/audio/${files[Math.floor(Math.random() * files.length)]}.mp3`,
     { volume: 0.5 }
   );
+  const handleFallingEnd = (id: number) =>
+    setFallingImgs((prevImages) => prevImages.filter((img) => img.id !== id));
 
   const spawnFalling = () => {
     const id = new Date().getTime();
@@ -93,18 +103,13 @@ export default function Home() {
     const randomSize = Math.random() * 10 + 5; // Random size (10vw to 30vw)
     const newImage = { id, randomX, randomSway, randomSize };
     setFallingImgs((prevImages: FallingImage[]) => [...prevImages, newImage]);
-    setTimeout(() => {
-      setFallingImgs((prevImages: FallingImage[]) =>
-        prevImages.filter((img) => img.id !== id)
-      );
-    }, 4000);
   };
 
   const onClick = async () => {
     if (pulse) return;
     triggerPulse();
     play();
-    await set(ref(db, "global"), {
+    await set(globalRef, {
       counter: incr(100),
     });
     await set(ref(db, "users/" + localStorage.getItem("userId")), {
@@ -116,16 +121,16 @@ export default function Home() {
   const onCheckedChange = (checked: boolean) => setIsJP(checked);
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    let userId = localStorage.getItem("userId");
     if (!userId) {
-      localStorage.setItem("userId", uuid());
+      userId = uuid();
+      localStorage.setItem("userId", userId);
     }
-    const globalData = ref(db, "global");
     const userUnsub = onValue(ref(db, "users/" + userId), (snapshot) => {
       const data = snapshot.val();
       setUserData(data);
     });
-    const globalUnsub = onValue(globalData, (snapshot) => {
+    const globalUnsub = onValue(globalRef, (snapshot) => {
       const count = snapshot.val().counter;
       setCounter(count);
       spawnFalling();
@@ -139,20 +144,41 @@ export default function Home() {
   return (
     <main className="flex w-full h-screen flex-col items-center justify-center p-24 bg-slate-100 overflow-hidden">
       <div className="absolute top-4 left-4 z-100 flex flex-row w-1/4 justify-left gap-4 items-center">
-        <Tooltip content={isJP ? "ARS 通貨" : "ARS Currency"} side="bottom">
-          <Box maxWidth="350px" className="flex">
-            <Card>
-              <Flex gap="3" align="center">
-                <RocketIcon />
-                <Box>
-                  <Text as="div" size="2" color="gray">
-                    {(userData ? userData.currency : 0) || 0} ARS
-                  </Text>
-                </Box>
-              </Flex>
-            </Card>
-          </Box>
-        </Tooltip>
+        <Dialog.Root>
+          <Tooltip content={isJP ? "入店" : "Enter the store"} side="bottom">
+            <Box maxWidth="6rem" minWidth="6rem">
+              <Dialog.Trigger asChild>
+                <Card asChild className="hover:bg-gray-300 active:bg-gray-600">
+                  <a className="hover:cursor-pointer">
+                    <Flex gap="3" align="center">
+                      <RocketIcon />
+                      <Box>
+                        <Text as="div" size="2" color="gray">
+                          {(userData ? userData.currency : 0) || 0} ARS
+                        </Text>
+                      </Box>
+                    </Flex>
+                  </a>
+                </Card>
+              </Dialog.Trigger>
+            </Box>
+          </Tooltip>
+          <Dialog.Portal>
+            <Dialog.Overlay className="bg-blackA data-[state=open]:animate-overlayShow fixed inset-0" />
+            <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
+              <Dialog.Title className="text-mauve12 m-0 text-[17px] font-medium">
+                {isJP ? "販売店" : "ARS Store"}
+              </Dialog.Title>
+              <Dialog.Description className="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
+                {isJP ? "ここで$ARSを使ってください!" : "Spend your $ARS here!"}
+              </Dialog.Description>
+              <ScrollArea type="always" scrollbars="vertical"></ScrollArea>
+              <Text as="div" size="1" mb="1" weight="bold" color="gray">
+                {!isJP ? "Coming soon!" : "近日公開!"}
+              </Text>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
         <Dialog.Root>
           <Tooltip content={isJP ? "情報" : "Information"} side="bottom">
             <Dialog.Trigger asChild>
@@ -311,6 +337,7 @@ export default function Home() {
             width: `${img.randomSize}vw`,
           }}
           alt="Falling Ars"
+          onAnimationEnd={() => handleFallingEnd(img.id)}
         />
       ))}
       <div className="flex w-full flex-row justify-center">
