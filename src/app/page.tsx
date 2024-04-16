@@ -138,16 +138,34 @@ export default function Home() {
 
   return (
     <main className="flex w-full h-screen flex-col items-center justify-center p-24 bg-slate-100 overflow-hidden">
-      <div className="absolute top-3 right-24 z-100">
+      <div className="absolute top-4 left-4 z-100 flex flex-row w-1/4 justify-left gap-4 items-center">
+        <Tooltip content={isJP ? "ARS 通貨" : "ARS Currency"} side="bottom">
+          <Box maxWidth="350px" className="flex">
+            <Card>
+              <Flex gap="3" align="center">
+                <RocketIcon />
+                <Box>
+                  <Text as="div" size="2" color="gray">
+                    {(userData ? userData.currency : 0) || 0} ARS
+                  </Text>
+                </Box>
+              </Flex>
+            </Card>
+          </Box>
+        </Tooltip>
         <Dialog.Root>
-          <Dialog.Trigger asChild>
-            <IconButton
-              className="hover:cursor-pointer items-center justify-center"
-              variant="outline"
-            >
-              <QuestionMarkIcon />
-            </IconButton>
-          </Dialog.Trigger>
+          <Tooltip content={isJP ? "情報" : "Information"} side="bottom">
+            <Dialog.Trigger asChild>
+              <IconButton
+                className="hover:cursor-pointer items-center justify-center"
+                variant="outline"
+                radius="medium"
+                size="2"
+              >
+                <QuestionMarkIcon />
+              </IconButton>
+            </Dialog.Trigger>
+          </Tooltip>
           <Dialog.Portal>
             <Dialog.Overlay className="bg-blackA data-[state=open]:animate-overlayShow fixed inset-0" />
 
@@ -236,19 +254,7 @@ export default function Home() {
         </Dialog.Root>
       </div>
 
-      <Box maxWidth="350px" className="absolute top-4 left-4">
-        <Card>
-          <Flex gap="3" align="center">
-            <RocketIcon />
-            <Box>
-              <Text as="div" size="2" color="gray">
-                {(userData ? userData.currency : 0) || 0} ARS
-              </Text>
-            </Box>
-          </Flex>
-        </Card>
-      </Box>
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-6 right-6">
         <Tooltip
           content={isJP ? "言語を切り替える" : "Switch language"}
           side="bottom"
