@@ -23,7 +23,7 @@ export default function Profile({
   return (
     <Dialog.Root>
       <Tooltip content={isJP ? "情報" : "Information"} side="right">
-        <Dialog.Trigger>
+        <Dialog.Trigger disabled>
           <Card asChild className="hover:bg-indigo-300 active:bg-indigo-600">
             <a className="hover:cursor-pointer">
               <Flex gap="3" align="center">
@@ -41,7 +41,7 @@ export default function Profile({
       <Dialog.Content maxWidth="450px">
         <Dialog.Title>Profile</Dialog.Title>
         <Dialog.Description size="2">
-          Select Ars&apos; outfit!
+          Select Ars&apos; outfit! (Under construction 🚧)
         </Dialog.Description>
         <div className="w-full h-full flex flex-col justify-center items-center mt-4">
           <Carousel className="w-1/2 max-w-xs">
