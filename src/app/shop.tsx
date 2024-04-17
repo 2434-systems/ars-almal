@@ -5,7 +5,6 @@ import {
   Card,
   Dialog,
   Flex,
-  Heading,
   RadioCards,
   Strong,
   Text,
