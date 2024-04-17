@@ -54,7 +54,7 @@ const config: Config = {
         },
       },
       animation: {
-        clicky: "clicky 0.2s ease-in-out",
+        clicky: "clicky 0.3s ease-in-out",
         overlayShow: "overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
         contentShow: "contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
         "fall-left": "fall-and-fade-left 4s linear forwards",

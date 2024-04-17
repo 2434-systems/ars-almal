@@ -1,139 +1,61 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { initializeApp } from "firebase/app";
-import {
-  getDatabase,
-  set,
-  ref,
-  increment,
-  onValue,
-  get,
-} from "firebase/database";
-
-import {
-  Box,
-  Button,
-  Card,
-  Container,
-  Flex,
-  Grid,
-  IconButton,
-  Inset,
-  ScrollArea,
-  Skeleton,
-  Strong,
-  Switch,
-  Table,
-  Text,
-  Tooltip,
-} from "@radix-ui/themes";
-import * as Dialog from "@radix-ui/react-dialog";
-import {
-  QuestionMarkIcon,
-  Cross2Icon,
-  RocketIcon,
-} from "@radix-ui/react-icons";
-
-import { v4 as uuid } from "uuid";
+import { Switch, Tooltip } from "@radix-ui/themes";
 import useSound from "use-sound";
+import { onValue, ref } from "firebase/database";
 
-type UserData = {
-  counter: number;
-  progress: number;
-  currency: number;
-};
-
-type FallingImage = {
-  id: number;
-  randomX: number;
-  randomSway: string;
-  randomSize: number;
-};
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-};
-
-const files = [
-  "gushi",
-  "ausaumau1",
-  "ausaumau2",
-  "laugh1",
-  "tasukete",
-  "hentai",
-  "mad",
-];
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const globalRef = ref(db, "global");
-
-const incr = (val: number) =>
-  increment(process.env.NODE_ENV === "development" ? 0 : val);
+import {
+  addSpin,
+  db,
+  GlobalData,
+  globalRef,
+  increaseCounter,
+  UserData,
+} from "@/util/firebase";
+import { getUserId } from "@/util/localStorage";
+import { getAudioFile } from "@/util/sound";
+import Shop from "./shop";
+import Info from "./info";
+import Ars from "./ars";
+import MiniArs from "./mini";
 
 export default function Home() {
-  const [counter, setCounter] = useState(0);
-  const [userData, setUserData] = useState({} as UserData);
-  const [pulse, setPulse] = useState(false);
+  const [globalData, setGlobalData] = useState({
+    counter: 0,
+    spin: 0,
+  } as GlobalData);
+  const [userData, setUserData] = useState({
+    counter: 0,
+    progress: 0,
+    currency: 0,
+  } as UserData);
   const [isJP, setIsJP] = useState(false);
-  const handleAnimationEnd = () => setPulse(false);
-  const triggerPulse = () => setPulse(true);
-  const [fallingImgs, setFallingImgs] = useState([] as FallingImage[]);
 
-  const [play] = useSound(
-    `/audio/${files[Math.floor(Math.random() * files.length)]}.mp3`,
-    { volume: 0.5 }
-  );
-  const handleFallingEnd = (id: number) =>
-    setFallingImgs((prevImages) => prevImages.filter((img) => img.id !== id));
+  const [play] = useSound(getAudioFile(), { volume: 0.5 });
 
-  const spawnFalling = () => {
-    const id = new Date().getTime();
-    const randomX = Math.random() * 100; // Random horizontal start percentage
-    const randomSway = Math.random() > 0.5 ? "right" : "left"; // Randomly choose sway direction
-    const randomSize = Math.random() * 10 + 5; // Random size (10vw to 30vw)
-    const newImage = { id, randomX, randomSway, randomSize };
-    setFallingImgs((prevImages: FallingImage[]) => [...prevImages, newImage]);
-  };
-
-  const onClick = async () => {
-    if (pulse) return;
-    triggerPulse();
+  const handleClick = async () => {
     play();
-    await set(globalRef, {
-      counter: incr(100),
-    });
-    await set(ref(db, "users/" + localStorage.getItem("userId")), {
-      counter: incr(1),
-      progress: incr(100),
-      currency: incr(1),
-    });
+    const userId = getUserId();
+    await increaseCounter(userId, 1);
+    if (userData.events) {
+      const spinEvent = userData.events["spin"];
+      if (typeof spinEvent === "number" && spinEvent > Date.now() / 1000) {
+        await addSpin();
+      }
+    }
   };
   const onCheckedChange = (checked: boolean) => setIsJP(checked);
 
   useEffect(() => {
-    let userId = localStorage.getItem("userId");
-    if (!userId) {
-      userId = uuid();
-      localStorage.setItem("userId", userId);
-    }
+    const userId = getUserId();
     const userUnsub = onValue(ref(db, "users/" + userId), (snapshot) => {
       const data = snapshot.val();
       setUserData(data);
     });
     const globalUnsub = onValue(globalRef, (snapshot) => {
-      const count = snapshot.val().counter;
-      setCounter(count);
-      spawnFalling();
+      const data = snapshot.val();
+      setGlobalData(data);
     });
     return () => {
       userUnsub();
@@ -142,133 +64,11 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="flex w-full h-screen flex-col items-center justify-center p-24 bg-slate-100 overflow-hidden">
-      <div className="absolute top-4 left-4 z-100 flex flex-row w-1/4 justify-left gap-4 items-center">
-        <Dialog.Root>
-          <Tooltip content={isJP ? "入店" : "Enter the store"} side="bottom">
-            <Box>
-              <Dialog.Trigger asChild>
-                <Card asChild className="hover:bg-gray-300 active:bg-gray-600">
-                  <a className="hover:cursor-pointer">
-                    <Flex gap="3" align="center">
-                      <RocketIcon />
-                      <Box className="text-nowrap">
-                        <Text as="div" size="2" color="gray">
-                          {(userData ? userData.currency : 0) || 0} ARS
-                        </Text>
-                      </Box>
-                    </Flex>
-                  </a>
-                </Card>
-              </Dialog.Trigger>
-            </Box>
-          </Tooltip>
-          <Dialog.Portal>
-            <Dialog.Overlay className="bg-blackA data-[state=open]:animate-overlayShow fixed inset-0" />
-            <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
-              <Dialog.Title className="text-mauve12 m-0 text-[17px] font-medium">
-                {isJP ? "販売店" : "ARS Store"}
-              </Dialog.Title>
-              <Dialog.Description className="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
-                {isJP ? "ここで$ARSを使ってください!" : "Spend your $ARS here!"}
-              </Dialog.Description>
-              <ScrollArea type="always" scrollbars="vertical"></ScrollArea>
-              <Text as="div" size="1" mb="1" weight="bold" color="gray">
-                {!isJP ? "Coming soon!" : "近日公開!"}
-              </Text>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
-        <Dialog.Root>
-          <Tooltip content={isJP ? "情報" : "Information"} side="bottom">
-            <Dialog.Trigger asChild>
-              <IconButton
-                className="hover:cursor-pointer items-center justify-center"
-                variant="outline"
-                radius="medium"
-                size="2"
-              >
-                <QuestionMarkIcon />
-              </IconButton>
-            </Dialog.Trigger>
-          </Tooltip>
-          <Dialog.Portal>
-            <Dialog.Overlay className="bg-blackA data-[state=open]:animate-overlayShow fixed inset-0" />
-
-            <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
-              <Dialog.Title className="text-mauve12 m-0 text-[17px] font-medium">
-                {isJP ? "情報" : "Information"}
-              </Dialog.Title>
-              <Dialog.Description className="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
-                <span>
-                  <a
-                    href="https://www.youtube.com/@ArsAlmal"
-                    className="text-blue-400"
-                  >
-                    {isJP ? "アルス・アルマル" : "Ars Almal"}
-                  </a>
-                  {isJP
-                    ? "はにじさんじ所属のバーチャルYouTuberです。とてもかわいい小さな頭を持っていますが、どれくらい大きくなるのでしょうか?"
-                    : "is a Virtual Youtuber affiliated with Nijisanji. She has a very cute and tiny face. But how big can she go?"}
-                </span>
-              </Dialog.Description>
-              <div className="pb-4">
-                <Table.Root size="2">
-                  <Table.Header>
-                    <Table.Row>
-                      <Table.ColumnHeaderCell>
-                        {isJP ? "統計情報" : "Statistics"}
-                      </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell>
-                        {isJP ? "値" : "Value"}
-                      </Table.ColumnHeaderCell>
-                    </Table.Row>
-                  </Table.Header>
-
-                  <Table.Body>
-                    <Table.Row>
-                      <Table.RowHeaderCell>
-                        {isJP ? "クリック数" : "Your clicks"}
-                      </Table.RowHeaderCell>
-                      <Table.Cell>{userData ? userData.counter : 0}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                      <Table.RowHeaderCell>
-                        {isJP ? "進歩" : "Your progress"}
-                      </Table.RowHeaderCell>
-                      <Table.Cell>
-                        {(userData ? userData.progress : 0) / 100}m
-                      </Table.Cell>
-                    </Table.Row>
-                  </Table.Body>
-                </Table.Root>
-              </div>
-
-              {/* <div className="mt-[25px] flex justify-end">
-                <Dialog.Close asChild>
-                  <button className="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
-                    Save changes
-                  </button>
-                </Dialog.Close>
-              </div> */}
-              <Flex direction="column" gap="3">
-                <Text as="div" size="1" mb="1" weight="bold" color="gray">
-                  Made with ❤️ by <a href="https://x.com/eightyzy">80</a>
-                </Text>
-              </Flex>
-              <Dialog.Close asChild>
-                <button
-                  className="text-violet11 hover:bg-violet4 focus:shadow-violet7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none z-20"
-                  aria-label="Close"
-                >
-                  <Cross2Icon />
-                </button>
-              </Dialog.Close>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+    <main className="flex w-full h-screen flex-col items-center justify-center p-24 overflow-hidden">
+      <div className="absolute top-4 left-4 z-1 flex flex-row w-1/4 justify-left gap-4 items-center">
+        <Shop isJP={isJP} userData={userData} />
+        <Info isJP={isJP} userData={userData} />
       </div>
-
       <div className="absolute top-6 right-6">
         <Tooltip
           content={isJP ? "言語を切り替える" : "Switch language"}
@@ -276,7 +76,7 @@ export default function Home() {
         >
           <Switch
             size="3"
-            className="hover:cursor-pointer z-20"
+            className="hover:cursor-pointer z-1"
             onCheckedChange={onCheckedChange}
             variant="soft"
           />
@@ -292,62 +92,21 @@ export default function Home() {
           {isJP ? "アルス・アルマル" : "ars almal"}
         </h1>
       </div>
-      <div
-        className={`relative flex place-items-center ${
-          pulse ? "animate-clicky" : ""
-        }`}
-        onClick={onClick}
-        onAnimationEnd={handleAnimationEnd}
-      >
-        <Image
-          className="relative rounded-full drop-shadow-2xl hover:scale-110 active:scale-100 transition-transform duration-200 ease-in-out hover:cursor-pointer z-20"
-          src="/ars.png"
-          alt="Big Face"
-          width={counter / 2000 + 300}
-          height={counter / 2000 + 300}
-          priority
-        />
-      </div>
-      {fallingImgs.map((img: FallingImage) => (
-        <Image
-          key={img.id}
-          src="/ars.png"
-          width={50}
-          height={50}
-          className={`absolute ${
-            img.randomSway === "right"
-              ? "animate-fall-right"
-              : "animate-fall-left"
-          } z-10`}
-          style={{
-            top: "-100px",
-            left: `${img.randomX}%`,
-            transform: "translateX(-50%)",
-            width: `${img.randomSize}vw`,
-          }}
-          alt="Falling Ars"
-          onAnimationEnd={() => handleFallingEnd(img.id)}
-        />
-      ))}
+      <Ars
+        handleClick={handleClick}
+        userData={userData}
+        globalData={globalData}
+      />
+      <MiniArs globalData={globalData} />
       <div className="flex w-full flex-row justify-center">
         <div className="w-full text-black pt-8 text-center text-[3.5vw] sm:text-xl">
-          {isJP ? (
-            <h2>
-              頭の幅が
-              <span className="text-blue-400 font-bold">
-                {(counter / 100000).toFixed(3)}km
-              </span>
-              になった
-            </h2>
-          ) : (
-            <h2>
-              her head is now{" "}
-              <span className="text-blue-400 font-bold">
-                {(counter / 100000).toFixed(3)}km
-              </span>{" "}
-              wide
-            </h2>
-          )}
+          <h2>
+            {isJP ? "頭の幅が" : "her head is now "}
+            <span className="text-blue-400 font-bold">
+              {(globalData.counter / 100000).toFixed(3)}km
+            </span>
+            {isJP ? "になった" : " wide"}
+          </h2>
         </div>
       </div>
     </main>
