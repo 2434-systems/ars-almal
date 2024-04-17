@@ -31,7 +31,7 @@ export default function Ars({
           transition: { duration: 0.1 },
         });
       }}
-      whileInView={{ rotate: `${globalData.spin % 180}deg` }}
+      whileInView={{ rotate: `${globalData.spin % 360}deg` }}
     >
       <Image
         className={`relative rounded-full drop-shadow-2xl hover:cursor-pointer`}

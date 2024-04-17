@@ -1,0 +1,27 @@
+{
+  "Home": {
+    "title": "ars almal",
+    "subtitle": "her head is now {size}km wide"
+  },
+  "Shop": {
+    "title": "ARS Store",
+    "description": "Spend your $ARS here!",
+    "buyButton": "Purchase",
+    "buySuccess": "Successfully purchased {item} for {price} $ARS",
+    "buyCancel": "Cancel",
+    "buyConfirm": "Confirm",
+    "confirmationTitle": "Confirm Purchase",
+    "confirmationDesc": "Are you sure you want to buy {item} for {price} $ARS?"
+  },
+  "Info": {
+    "title": "Information",
+    "button": "Info",
+    "description": "",
+    "statsTitle": "Statistics",
+    "statsTitle2": "Value",
+    "statsClicks": "Your clicks",
+    "statsProgress": "Your progress",
+    "footer": ""
+  },
+  "Settings": {}
+}

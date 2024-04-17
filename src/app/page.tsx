@@ -1,7 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import { Switch, Tooltip } from "@radix-ui/themes";
 import useSound from "use-sound";
 import { onValue, ref } from "firebase/database";
 
@@ -15,10 +13,11 @@ import {
 } from "@/util/firebase";
 import { getUserId } from "@/util/localStorage";
 import { getAudioFile } from "@/util/sound";
-import Shop from "./shop";
-import Info from "./info";
-import Ars from "./ars";
-import MiniArs from "./mini";
+import Shop from "@/components/Shop";
+import Info from "@/components/Info";
+import Ars from "@/components/Ars";
+import MiniArs from "@/components/MiniArs";
+import Settings from "@/components/Settings";
 
 export default function Home() {
   const [globalData, setGlobalData] = useState({
@@ -65,23 +64,12 @@ export default function Home() {
 
   return (
     <main className="flex w-full h-screen flex-col items-center justify-center p-24 overflow-hidden">
-      <div className="absolute top-4 left-4 z-1 flex flex-row w-1/4 justify-left gap-4 items-center">
+      <div className="absolute top-4 left-4 z-1 flex flex-col justify-left gap-2 items-left">
         <Shop isJP={isJP} userData={userData} />
         <Info isJP={isJP} userData={userData} />
       </div>
       <div className="absolute top-6 right-6">
-        <Tooltip
-          content={isJP ? "言語を切り替える" : "Switch language"}
-          side="bottom"
-        >
-          <Switch
-            size="3"
-            className="hover:cursor-pointer z-1"
-            onCheckedChange={onCheckedChange}
-            variant="soft"
-          />
-        </Tooltip>
-        {isJP ? " JP" : " EN"}
+        <Settings isJP={isJP} onCheckedChange={onCheckedChange} />
       </div>
       <div className="w-full">
         <h1

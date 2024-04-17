@@ -1,4 +1,8 @@
-import { Cross2Icon, QuestionMarkIcon } from "@radix-ui/react-icons";
+import {
+  Cross2Icon,
+  PersonIcon,
+  QuestionMarkIcon,
+} from "@radix-ui/react-icons";
 import {
   Flex,
   Text,
@@ -7,6 +11,7 @@ import {
   Tooltip,
   Dialog,
   Inset,
+  Button,
 } from "@radix-ui/themes";
 import { UserData } from "@/util/firebase";
 
@@ -21,14 +26,15 @@ export default function Info({
     <Dialog.Root>
       <Tooltip content={isJP ? "情報" : "Information"} side="bottom">
         <Dialog.Trigger>
-          <IconButton
+          <Button
             className="hover:cursor-pointer items-center justify-center"
             variant="outline"
             radius="medium"
-            size="2"
+            size="3"
           >
-            <QuestionMarkIcon />
-          </IconButton>
+            <PersonIcon />
+            Info
+          </Button>
         </Dialog.Trigger>
       </Tooltip>
       <Dialog.Content maxWidth="450px">

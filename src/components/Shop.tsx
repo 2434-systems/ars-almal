@@ -64,7 +64,7 @@ export default function Shop({
                 <Flex gap="3" align="center">
                   <RocketIcon />
                   <Box className="text-nowrap">
-                    <Text as="div" size="2" color="gray">
+                    <Text as="div" size="2">
                       {(userData ? userData.currency : 0) || 0} ARS
                     </Text>
                   </Box>
