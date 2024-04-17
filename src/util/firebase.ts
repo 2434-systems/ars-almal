@@ -43,7 +43,7 @@ export const increaseCounter = async (userId: string, val: number) => {
 export const incrementCurrency = async (userId: string, val: number) => {
   const updates = {} as Record<string, number | object>;
   updates[`users/${userId}/currency`] = increment(val);
-  if (val > 0) updates[`users/${userId}/stats/spent`] = increment(val);
+  if (val < 0) updates[`users/${userId}/stats/spent`] = increment(val);
   await update(ref(db), updates);
 };
 
