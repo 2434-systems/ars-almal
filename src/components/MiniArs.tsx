@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { FallingImage, generateFallingArs } from "@/util/falling";
 import { GlobalData } from "@/util/firebase";
 
@@ -19,24 +20,59 @@ export default function MiniArs({ globalData }: { globalData: GlobalData }) {
     spawnFalling();
   }, [globalData]);
 
+  // keyframes: {
+  //   "fall-and-fade-left": {
+  //     "0%": { transform: "translate(-50%, 0) rotate(0)", opacity: "1" },
+  //     "90%": { opacity: "1" },
+  //     "100%": {
+  //       transform: "translate(-75%, 100vh) rotate(-30deg)",
+  //       opacity: "0",
+  //     },
+  //   },
+  //   "fall-and-fade-right": {
+  //     "0%": { transform: "translate(-50%, 0) rotate(0)", opacity: "1" },
+  //     "90%": { opacity: "1" },
+  //     "100%": {
+  //       transform: "translate(-25%, 100vh) rotate(30deg)",
+  //       opacity: "0",
+  //     },
+  //   },
+  // },
+  // animation: {
+  //   "fall-left": "fall-and-fade-left 4s linear forwards",
+  //   "fall-right": "fall-and-fade-right 4s linear forwards",
+  // },
+
   return fallingImgs.map((img: FallingImage) => (
-    <Image
+    <motion.div
       key={img.id}
-      src="/ars.png"
-      width={50}
-      height={50}
-      className={`absolute ${
-        img.randomSway === "right" ? "animate-fall-right" : "animate-fall-left"
-      }`}
+      animate={{
+        y: "100vh",
+        rotate: img.randomSway === "right" ? 30 : -30,
+        opacity: [1, 1, 0],
+      }}
+      transition={{
+        duration: 4,
+        ease: "linear",
+      }}
       style={{
+        position: "absolute",
         top: "-100px",
         left: `${img.randomX}%`,
         transform: "translateX(-50%)",
-        width: `${img.randomSize}vw`,
         zIndex: -1,
       }}
-      alt="Falling Ars"
-      onAnimationEnd={() => handleFallingEnd(img.id)}
-    />
+      onAnimationComplete={() => handleFallingEnd(img.id)}
+    >
+      <Image
+        src="/ars.png"
+        width={50}
+        height={50}
+        style={{
+          width: `${img.randomSize}vw`,
+        }}
+        alt="Falling Ars"
+      />
+    </motion.div>
   ));
 }
