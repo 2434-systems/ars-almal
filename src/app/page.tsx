@@ -18,6 +18,7 @@ import Info from "@/components/Info";
 import Ars from "@/components/Ars";
 import MiniArs from "@/components/MiniArs";
 import Settings from "@/components/Settings";
+import Profile from "@/components/Profile";
 
 export default function Home() {
   const [globalData, setGlobalData] = useState({
@@ -67,6 +68,7 @@ export default function Home() {
       <div className="absolute top-4 left-4 z-1 flex flex-col justify-left gap-2 items-left">
         <Shop isJP={isJP} userData={userData} />
         <Info isJP={isJP} userData={userData} />
+        <Profile isJP={isJP} userData={userData} />
       </div>
       <div className="absolute top-6 right-6">
         <Settings isJP={isJP} onCheckedChange={onCheckedChange} />

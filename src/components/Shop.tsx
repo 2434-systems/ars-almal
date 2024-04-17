@@ -56,7 +56,7 @@ export default function Shop({
   return (
     <Dialog.Root onOpenChange={setOpen} open={open}>
       <Toaster />
-      <Tooltip content={isJP ? "入店" : "Enter the store"} side="bottom">
+      <Tooltip content={isJP ? "入店" : "Enter the store"} side="right">
         <Box>
           <Dialog.Trigger>
             <Card asChild className="hover:bg-gray-300 active:bg-gray-600">

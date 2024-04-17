@@ -1,17 +1,14 @@
-import {
-  Cross2Icon,
-  PersonIcon,
-  QuestionMarkIcon,
-} from "@radix-ui/react-icons";
+import { Cross2Icon, InfoCircledIcon } from "@radix-ui/react-icons";
 import {
   Flex,
   Text,
-  IconButton,
   Table,
   Tooltip,
   Dialog,
   Inset,
   Button,
+  Card,
+  Box,
 } from "@radix-ui/themes";
 import { UserData } from "@/util/firebase";
 
@@ -24,17 +21,20 @@ export default function Info({
 }) {
   return (
     <Dialog.Root>
-      <Tooltip content={isJP ? "情報" : "Information"} side="bottom">
+      <Tooltip content={isJP ? "情報" : "Information"} side="right">
         <Dialog.Trigger>
-          <Button
-            className="hover:cursor-pointer items-center justify-center"
-            variant="outline"
-            radius="medium"
-            size="3"
-          >
-            <PersonIcon />
-            Info
-          </Button>
+          <Card asChild className="hover:bg-blue-300 active:bg-blue-600">
+            <a className="hover:cursor-pointer">
+              <Flex gap="3" align="center">
+                <InfoCircledIcon />
+                <Box className="text-nowrap">
+                  <Text as="div" size="2">
+                    Info
+                  </Text>
+                </Box>
+              </Flex>
+            </a>
+          </Card>
         </Dialog.Trigger>
       </Tooltip>
       <Dialog.Content maxWidth="450px">
@@ -98,7 +98,7 @@ export default function Info({
         </Flex>
         <Dialog.Close>
           <button
-            className="text-violet11 hover:bg-violet4 focus:shadow-violet7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none z-20"
+            className="text-blue-900 hover:bg-blue-100 focus:shadow-blue-300 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none z-20"
             aria-label="Close"
           >
             <Cross2Icon />
