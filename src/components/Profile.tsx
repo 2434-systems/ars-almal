@@ -1,4 +1,4 @@
-import { Cross2Icon, PersonIcon } from "@radix-ui/react-icons";
+import { Cross2Icon, MagicWandIcon } from "@radix-ui/react-icons";
 import { Flex, Text, Tooltip, Dialog, Card, Box } from "@radix-ui/themes";
 import {
   Card as ShadCard,
@@ -27,10 +27,10 @@ export default function Profile({
           <Card asChild className="hover:bg-indigo-300 active:bg-indigo-600">
             <a className="hover:cursor-pointer">
               <Flex gap="3" align="center">
-                <PersonIcon />
+                <MagicWandIcon />
                 <Box className="text-nowrap">
                   <Text as="div" size="2">
-                    Profile
+                    Outfits
                   </Text>
                 </Box>
               </Flex>

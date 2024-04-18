@@ -65,8 +65,8 @@ export default function MiniArs({ globalData }: { globalData: GlobalData }) {
       onAnimationComplete={() => handleFallingEnd(img.id)}
     >
       <Image
-        src="/ars.png"
-        width={50}
+        src="/manjuu.png"
+        width={62.5}
         height={50}
         style={{
           width: `${img.randomSize}vw`,
