@@ -37,8 +37,8 @@ export default function Ars({
         className={`relative rounded-full drop-shadow-2xl hover:cursor-pointer`}
         src="/ars.png"
         alt="Big Face"
-        width={globalData.counter / 10000 + 300}
-        height={globalData.counter / 10000 + 300}
+        width={globalData.counter / 50000 + 300}
+        height={globalData.counter / 50000 + 300}
         priority
         ref={scope}
         onClick={onClick}

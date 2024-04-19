@@ -37,7 +37,7 @@ export default function Home() {
   const handleClick = async () => {
     play();
     const userId = getUserId();
-    await increaseCounter(userId, 1);
+    await increaseCounter(userId, 10000);
     if (userData.events) {
       const spinEvent = userData.events["spin"];
       if (typeof spinEvent === "number" && spinEvent > Date.now() / 1000) {
