@@ -93,7 +93,7 @@ export default function Home() {
           <h2>
             {isJP ? "頭の幅が" : "her head is now "}
             <span className="text-blue-400 font-bold">
-              {(globalData.counter / 100000).toFixed(3)}km
+              {(globalData.counter / 100000).toFixed(1)}km
             </span>
             {isJP ? "になった" : " wide"}
           </h2>
