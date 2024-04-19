@@ -33,7 +33,7 @@ const incr = (val: number) =>
 
 export const increaseCounter = async (userId: string, val: number) => {
   const updates = {} as Record<string, number | object>;
-  updates["global/counter"] = incr(100);
+  updates["global/counter"] = incr(val);
   updates[`users/${userId}/counter`] = incr(1);
   updates[`users/${userId}/progress`] = incr(val);
   updates[`users/${userId}/currency`] = incr(1);
