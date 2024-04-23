@@ -77,7 +77,7 @@ export default function Info({
                   {isJP ? "進歩" : "Your progress"}
                 </Table.RowHeaderCell>
                 <Table.Cell>
-                  {(userData ? userData.progress : 0) / 100}m
+                  {(userData ? userData.progress : 0) / 100000}km
                 </Table.Cell>
               </Table.Row>
             </Table.Body>
